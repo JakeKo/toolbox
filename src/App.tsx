@@ -2,6 +2,7 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import { Link } from "react-router-dom";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -29,6 +30,8 @@ function App() {
       </div>
 
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+
+      <Link to={"/budget-manager"}>BudgetManager</Link>
 
       <div className="row">
         <div>
