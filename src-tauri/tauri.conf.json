@@ -51,11 +51,9 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 600,
+        "fullscreen": true,
         "resizable": true,
-        "title": "toolbox",
-        "width": 800
+        "title": "toolbox"
       }
     ]
   }
