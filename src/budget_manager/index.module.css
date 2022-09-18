@@ -6,9 +6,20 @@
 .transactionRecords {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .transactionRecord {
   background-color: cadetblue;
+}
+
+.mutableTransactionRecord {
+  display: flex;
+  width: 100%;
+}
+
+.mutableTransactionRecord :global .mantine-TextInput-input,
+:global .mantine-NumberInput-input,
+:global .mantine-Select-input,
+:global .mantine-DatePicker-input {
+  border-radius: 0;
 }

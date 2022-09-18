@@ -1,9 +1,9 @@
-import { Button, NumberInput, Select, TextInput } from "@mantine/core";
+import { NumberInput, Select, TextInput } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import style from "../index.module.css";
 
-export interface FormValues {
+export interface MutableTransactionRecordFormValues {
   item: string;
   vendor: string;
   date: Date;
@@ -12,40 +12,40 @@ export interface FormValues {
 }
 
 type PropTypes = {
-  onSubmit: (values: FormValues) => void;
+  values: MutableTransactionRecordFormValues;
+  onSubmit: (value: MutableTransactionRecordFormValues) => void;
 };
-function TransactionRecordForm({ onSubmit }: PropTypes) {
-  const form = useForm<FormValues>({
-    initialValues: {
-      item: "",
-      vendor: "",
-      date: new Date(),
-      category: "unknown",
-      amount: 0,
-    },
+function MutableTransactionRecord({ values, onSubmit }: PropTypes) {
+  const form = useForm<MutableTransactionRecordFormValues>({
+    initialValues: values,
   });
 
   return (
-    <form className={style.recordingForm} onSubmit={form.onSubmit(onSubmit)}>
+    <form
+      className={style.mutableTransactionRecord}
+      onSubmit={form.onSubmit(onSubmit)}
+    >
       <TextInput
-        label="Item"
+        className={style.textInput}
         placeholder="Dinner"
+        required
         {...form.getInputProps("item")}
       />
       <TextInput
-        label="Vendor"
         placeholder="Raising Canes"
+        required
         {...form.getInputProps("vendor")}
       />
       <DatePicker
         placeholder="Pick date"
-        label="Date"
+        required
+        clearButtonTabIndex={-1}
         {...form.getInputProps("date")}
       />
       <Select
-        label="Category"
         placeholder="Dining"
         searchable
+        required
         data={[
           { value: "dining", label: "Dining" },
           { value: "housing_utilities", label: "Housing & Utilities" },
@@ -54,13 +54,12 @@ function TransactionRecordForm({ onSubmit }: PropTypes) {
       />
       <NumberInput
         placeholder="10"
-        label="Amount"
         min={0}
+        required
         {...form.getInputProps("amount")}
       />
-      <Button type="submit">Submit</Button>
     </form>
   );
 }
 
-export default TransactionRecordForm;
+export default MutableTransactionRecord;

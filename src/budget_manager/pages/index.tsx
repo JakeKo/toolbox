@@ -6,16 +6,25 @@ import {
   writeTextFile,
 } from "@tauri-apps/api/fs";
 import { useEffect, useState } from "react";
-import TransactionRecord from "../components/transaction_record";
-import TransactionRecordForm, {
-  FormValues,
-} from "../components/transaction_record_form";
+import MutableTransactionRecord, {
+  MutableTransactionRecordFormValues,
+} from "../components/mutable_transaction_record";
 import style from "../index.module.css";
 
+function initialValues(): MutableTransactionRecordFormValues {
+  return {
+    item: "",
+    vendor: "",
+    date: new Date(),
+    category: "unknown",
+    amount: 0,
+  };
+}
+
 function BudgetManager() {
-  const [transactionRecords, setTransactionRecords] = useState<FormValues[]>(
-    []
-  );
+  const [transactionRecords, setTransactionRecords] = useState<
+    MutableTransactionRecordFormValues[]
+  >([]);
 
   useEffect(() => {
     loadTransactionRecords();
@@ -41,7 +50,9 @@ function BudgetManager() {
     });
   }
 
-  function createTransactionRecord(values: FormValues): void {
+  function createTransactionRecord(
+    values: MutableTransactionRecordFormValues
+  ): void {
     setTransactionRecords([...transactionRecords, values]);
   }
 
@@ -50,10 +61,17 @@ function BudgetManager() {
       <h1>Welcome to Budget Manager!</h1>
       <Button onClick={saveTransactionRecords}>Save</Button>
       <Button onClick={loadTransactionRecords}>Refresh</Button>
-      <TransactionRecordForm onSubmit={createTransactionRecord} />
+      <MutableTransactionRecord
+        values={initialValues()}
+        onSubmit={createTransactionRecord}
+      />
       <div className={style.transactionRecords}>
         {transactionRecords.map((r) => (
-          <TransactionRecord key={Math.random()} record={r} />
+          <MutableTransactionRecord
+            key={Math.random()}
+            values={r}
+            onSubmit={() => {}}
+          />
         ))}
       </div>
     </div>
