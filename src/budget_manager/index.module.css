@@ -1,20 +1,12 @@
-.recordingForm {
-  display: flex;
-  width: 100%;
-}
-
+.body,
 .transactionRecords {
   display: flex;
   flex-direction: column;
-}
-
-.transactionRecord {
-  background-color: cadetblue;
+  align-items: center;
 }
 
 .mutableTransactionRecord {
   display: flex;
-  width: 100%;
 }
 
 .mutableTransactionRecord :global .mantine-TextInput-input,
@@ -22,4 +14,8 @@
 :global .mantine-Select-input,
 :global .mantine-DatePicker-input {
   border-radius: 0;
+}
+
+.mutableTransactionRecord :global .mantine-Select-itemsWrapper {
+  box-sizing: border-box;
 }
