@@ -1,4 +1,4 @@
-import { Button, Dialog, Group, Space, Text } from "@mantine/core";
+import { Button, CloseButton, Dialog, Group, Space, Text } from "@mantine/core";
 import {
   BaseDirectory,
   createDir,
@@ -103,6 +103,11 @@ function BudgetManager() {
     };
   }
 
+  function deleteRecord(id: string) {
+    const { [id]: _, ...newRecords } = records;
+    setRecords(newRecords);
+  }
+
   return (
     <div className={style.body}>
       <h1>Welcome to Budget Manager!</h1>
@@ -114,11 +119,17 @@ function BudgetManager() {
       <Space h="md" />
       <div className={style.transactionRecords}>
         {sortedRecords.map((r) => (
-          <MutableTransactionRecord
-            key={Math.random()}
-            values={r}
-            onSubmit={updateRecord(r.id)}
-          />
+          <div className={style.recordListItem}>
+            <CloseButton
+              className={style.recordDeleteButton}
+              onClick={() => deleteRecord(r.id)}
+            />
+            <MutableTransactionRecord
+              key={Math.random()}
+              values={r}
+              onSubmit={updateRecord(r.id)}
+            />
+          </div>
         ))}
       </div>
       <Dialog opened={recordsChanged} size="md" radius="md">

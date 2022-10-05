@@ -19,3 +19,12 @@
 .mutableTransactionRecord :global .mantine-Select-itemsWrapper {
   box-sizing: border-box;
 }
+
+.recordListItem {
+  position: relative;
+}
+
+.recordDeleteButton {
+  position: absolute;
+  left: -50px;
+}
