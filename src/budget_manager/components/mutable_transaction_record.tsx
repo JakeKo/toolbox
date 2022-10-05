@@ -16,21 +16,23 @@ export interface MutableTransactionRecordFormValues {
 type PropTypes = {
   values: MutableTransactionRecordFormValues;
   onSubmit: (values: MutableTransactionRecordFormValues) => void;
-  resetOnSubmit?: boolean;
+  isMainInput?: boolean;
 };
 function MutableTransactionRecord({
   values,
   onSubmit,
-  resetOnSubmit = false,
+  isMainInput = false,
 }: PropTypes) {
   const form = useForm<MutableTransactionRecordFormValues>({
     initialValues: values,
-    validate: {
-      item: (value) => (value === "" ? "Item is required" : null),
-      category: (value) =>
-        value === "unknown" ? "Category is required" : null,
-      amount: (value) => (value <= 0 ? "Value is required" : null),
-    },
+    validate: isMainInput
+      ? {}
+      : {
+          item: (value) => (value === "" ? "Item is required" : null),
+          category: (value) =>
+            value === "unknown" ? "Category is required" : null,
+          amount: (value) => (value <= 0 ? "Value is required" : null),
+        },
   });
 
   const handleSubmit = form.onSubmit(
@@ -38,10 +40,9 @@ function MutableTransactionRecord({
       if (form.isValid() && form.isDirty()) {
         onSubmit(values);
 
-        if (resetOnSubmit) {
+        if (isMainInput) {
           form.reset();
-
-          firstInputRef.current?.focus();
+          setTimeout(() => firstInputRef.current?.focus(), 0);
         }
       }
     }

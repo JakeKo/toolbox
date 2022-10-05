@@ -5,11 +5,16 @@ import {
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import MutableTransactionRecord, {
   MutableTransactionRecordFormValues,
 } from "../components/mutable_transaction_record";
 import style from "../index.module.css";
+
+type TransactionRecord = MutableTransactionRecordFormValues & {
+  id: string;
+};
 
 function initialValues(): MutableTransactionRecordFormValues {
   return {
@@ -21,15 +26,17 @@ function initialValues(): MutableTransactionRecordFormValues {
   };
 }
 
-function serializeRecords(data: MutableTransactionRecordFormValues[]) {
+function serializeRecords(data: Record<string, TransactionRecord>) {
   return JSON.stringify(data);
 }
 
 function deserializeRecords(data: string) {
   const parsed = JSON.parse(data);
-  parsed.forEach((item: any) => (item.date = new Date(item.date)));
+  Object.values(parsed).forEach(
+    (item: any) => (item.date = new Date(item.date))
+  );
 
-  return parsed as MutableTransactionRecordFormValues[];
+  return parsed as Record<string, TransactionRecord>;
 }
 
 /** Works like useState with a boolean determining if state was updated */
@@ -51,8 +58,12 @@ function useTrackedState<T>(initialState: T) {
 
 function BudgetManager() {
   const [records, setRecords, recordsChanged] = useTrackedState<
-    MutableTransactionRecordFormValues[]
-  >([]);
+    Record<string, TransactionRecord>
+  >({});
+  const sortedRecords = useMemo(
+    () => Object.values(records).sort((a, b) => (a.date < b.date ? -1 : 1)),
+    [records]
+  );
 
   useEffect(() => {
     loadRecords();
@@ -81,7 +92,15 @@ function BudgetManager() {
   }
 
   function createRecord(values: MutableTransactionRecordFormValues): void {
-    setRecords([...records, values]);
+    const id = uuidv4();
+    const transactionRecord: TransactionRecord = { ...values, id };
+    setRecords({ ...records, [id]: transactionRecord });
+  }
+
+  function updateRecord(id: string) {
+    return (values: MutableTransactionRecordFormValues): void => {
+      setRecords({ ...records, [id]: { id, ...values } });
+    };
   }
 
   return (
@@ -90,15 +109,15 @@ function BudgetManager() {
       <MutableTransactionRecord
         values={initialValues()}
         onSubmit={createRecord}
-        resetOnSubmit={true}
+        isMainInput
       />
       <Space h="md" />
       <div className={style.transactionRecords}>
-        {records.map((r) => (
+        {sortedRecords.map((r) => (
           <MutableTransactionRecord
             key={Math.random()}
             values={r}
-            onSubmit={(values) => console.log(values)}
+            onSubmit={updateRecord(r.id)}
           />
         ))}
       </div>
