@@ -1,12 +1,7 @@
 import { Button, CloseButton, Dialog, Group, Space, Text } from "@mantine/core";
-import {
-  BaseDirectory,
-  createDir,
-  readTextFile,
-  writeTextFile,
-} from "@tauri-apps/api/fs";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useStateFromFile } from "../../utils";
 import MutableTransactionRecord, {
   MutableTransactionRecordFormValues,
 } from "../components/mutable_transaction_record";
@@ -26,11 +21,7 @@ function initialValues(): MutableTransactionRecordFormValues {
   };
 }
 
-function serializeRecords(data: Record<string, TransactionRecord>) {
-  return JSON.stringify(data);
-}
-
-function deserializeRecords(data: string) {
+function deserialize(data: string) {
   const parsed = JSON.parse(data);
   Object.values(parsed).forEach(
     (item: any) => (item.date = new Date(item.date))
@@ -39,57 +30,17 @@ function deserializeRecords(data: string) {
   return parsed as Record<string, TransactionRecord>;
 }
 
-/** Works like useState with a boolean determining if state was updated */
-function useTrackedState<T>(initialState: T) {
-  const [state, setState] = useState(initialState);
-  const [changed, setChanged] = useState(false);
-
-  function setTrackedState(newState: T, newChanged: boolean = true) {
-    setState(newState);
-    setChanged(newChanged);
-  }
-
-  return [state, setTrackedState, changed] as [
-    T,
-    typeof setTrackedState,
-    boolean
-  ];
-}
-
 function BudgetManager() {
-  const [records, setRecords, recordsChanged] = useTrackedState<
+  const [records, setRecords, recordsChanged, load, save] = useStateFromFile<
     Record<string, TransactionRecord>
-  >({});
+  >({}, "budget_manager/transaction_records.json", { deserialize });
+
   const sortedRecords = useMemo(
     () => Object.values(records).sort((a, b) => (a.date < b.date ? -1 : 1)),
     [records]
   );
 
-  useEffect(() => {
-    loadRecords();
-  }, []);
-
-  async function loadRecords() {
-    const json = await readTextFile("budget_manager/transaction_records.json", {
-      dir: BaseDirectory.Document,
-    });
-
-    const records = deserializeRecords(json);
-    setRecords(records, false);
-  }
-
-  async function saveRecords() {
-    const json = serializeRecords(records);
-
-    await createDir("budget_manager", {
-      dir: BaseDirectory.Document,
-      recursive: true,
-    });
-    await writeTextFile("budget_manager/transaction_records.json", json, {
-      dir: BaseDirectory.Document,
-    });
-    setRecords(records, false);
-  }
+  useEffect(() => void load(), []);
 
   function createRecord(values: MutableTransactionRecordFormValues): void {
     const id = uuidv4();
@@ -138,10 +89,10 @@ function BudgetManager() {
         </Text>
 
         <Group>
-          <Button variant="outline" onClick={loadRecords}>
+          <Button variant="outline" onClick={load}>
             Reset
           </Button>
-          <Button onClick={saveRecords}>Save</Button>
+          <Button onClick={save}>Save</Button>
         </Group>
       </Dialog>
     </div>

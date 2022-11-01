@@ -29,6 +29,7 @@ function MutableTransactionRecord({
       ? {}
       : {
           item: (value) => (value === "" ? "Item is required" : null),
+          vendor: (value) => (value === "" ? "Vendor is required" : null),
           category: (value) =>
             value === "unknown" ? "Category is required" : null,
           amount: (value) => (value <= 0 ? "Value is required" : null),
