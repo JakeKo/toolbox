@@ -3,6 +3,7 @@ import { DatePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useFocusWithin } from "@mantine/hooks";
 import { useRef } from "react";
+import { EXPENSE_CATEGORY_DROPDOWN_VALUES } from "../constants";
 import style from "../index.module.css";
 
 export interface MutableTransactionRecordFormValues {
@@ -82,10 +83,7 @@ function MutableTransactionRecord({
         searchable
         required
         selectOnBlur
-        data={[
-          { value: "dining", label: "Dining" },
-          { value: "housing_utilities", label: "Housing & Utilities" },
-        ]}
+        data={EXPENSE_CATEGORY_DROPDOWN_VALUES}
         {...form.getInputProps("category")}
       />
       <NumberInput
